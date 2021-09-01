@@ -6,7 +6,14 @@ namespace Trie
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            TrieTree test = new TrieTree();
+
+            test.Add("hello");
+            test.Add("hey");
+            test.Add("he");
+            test.Remove("hello");
+            TrieNode searched = test.Search("he");
+
         }
     }
 }
