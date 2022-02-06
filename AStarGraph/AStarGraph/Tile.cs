@@ -16,6 +16,7 @@ namespace GraphVisualiz
         public bool clicked;
         public int SqSize;
         public Rectangle hitbox;
+        public bool path = false;
         public Tile(Texture2D texture, Vector2 pos, Color color, int sqSize, Rectangle? source = null, float rotation = 0) 
             : base(texture, pos, color, source, rotation)
         {

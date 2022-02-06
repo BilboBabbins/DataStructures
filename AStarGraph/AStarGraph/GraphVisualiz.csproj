@@ -21,6 +21,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\WeightedDirectGraphs\WeightedDirectGraphs\WeightedDirectGraphs.csproj" />
+    <ProjectReference Include="..\..\WeightedDirectGraphs\WeightedDirectGraphs.csproj" />
+    <!--<ProjectReference Include="..\..\WeightedDirectGraphs\WeightedDirectGraphs\WeightedDirectGraphs.csproj" />-->
   </ItemGroup>
 </Project>

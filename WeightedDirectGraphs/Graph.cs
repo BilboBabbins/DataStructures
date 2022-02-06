@@ -5,7 +5,7 @@ using System.Text;
 
 namespace WeightedDirectGraphs
 {
-    public class point
+    public struct point
     {
         public double x;
         public double y;
@@ -37,6 +37,7 @@ namespace WeightedDirectGraphs
         public Vertex<T> founder = null;
         public float disFromStart = float.PositiveInfinity;
         public double disFromEnd = double.PositiveInfinity;
+        public bool blocked = false;
      
         public Vertex(T value)
         {
@@ -460,7 +461,7 @@ namespace WeightedDirectGraphs
 
                     //Add all un-visited & un-queued neighbors to the priority queue.
                     if (current.Edges[a].EndPoint.visited == false &&
-                        !priorityQ.contains(current.Edges[a].EndPoint))
+                        !priorityQ.contains(current.Edges[a].EndPoint) && current.Edges[a].EndPoint.blocked != true)
                     {
                         priorityQ.insert(current.Edges[a].EndPoint);
                     }
