@@ -28,12 +28,12 @@ namespace GraphVisualiz
             Source = source;
             Rotation = rotation;
             Origin = new Vector2(0, 0);
-            Scale = new Vector2(0, 0);
+            Scale = new Vector2(1, 1);
             Effects = SpriteEffects.None;
             LayerDepth = 0;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Texture, Pos, Source, Tint, Rotation, Origin, Scale,
                 Effects, LayerDepth);

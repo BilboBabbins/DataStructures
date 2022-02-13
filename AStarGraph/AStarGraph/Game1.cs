@@ -20,11 +20,16 @@ namespace GraphVisualiz
         const int screenSize = 1000;
         const int sqSize = screenSize / graphSize;
         Texture2D pixel;
+        Texture2D blueButton;
         ButtonState prev = ButtonState.Released;
         bool setEnd = false;
         bool setStart = false;
         Tile[,] graph = new Tile[graphSize, graphSize];
-
+        Button Manhattan;
+        Button Diagonal;
+        Button Euclidean;
+        Button Start;
+        SpriteFont font;
 
         public Game1()
         {
@@ -120,6 +125,12 @@ namespace GraphVisualiz
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            font = Content.Load<SpriteFont>("Font");
+            blueButton = Content.Load<Texture2D>("blueButton");
+            Manhattan = new Button(blueButton, new Vector2(screenSize + 65, 10), Color.White, font, "Manhattan", Color.White);
+            Diagonal = new Button(blueButton, new Vector2(screenSize + 65, 210), Color.White, font, "Diagonal", Color.White);
+            Euclidean = new Button(blueButton, new Vector2(screenSize + 65, 410), Color.White, font, "Euclidean", Color.White);
+            Start = new Button(blueButton, new Vector2(screenSize + 65, 610), Color.Green, font, "Start", Color.GreenYellow);
             // TODO: use this.Content to load your game content here
         }
 
@@ -205,6 +216,9 @@ namespace GraphVisualiz
                     }
                 }
             }
+
+            //buttons updates
+
             Window.Title = $"{ms.Position}";
             prev = ms.LeftButton;
             base.Update(gameTime);
@@ -241,6 +255,11 @@ namespace GraphVisualiz
                 }
                
             }
+            Manhattan.Draw(spriteBatch);
+            Diagonal.Draw(spriteBatch);
+            Euclidean.Draw(spriteBatch);
+            Start.Draw(spriteBatch);
+            //spriteBatch.DrawString(font, "This is a sentence.", new Vector2(100, 100), Color.Red);
 
             //spriteBatch.Draw(temp, graph[5, 2].hitbox, Color.Red);
             base.Draw(gameTime);
