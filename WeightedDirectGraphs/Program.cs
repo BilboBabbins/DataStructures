@@ -5,7 +5,7 @@ namespace WeightedDirectGraphs
 {
     public class Program
     {
-        public static Graph<point> Generate(Graph<point> maingraph, int graphXMax, int graphYMax)
+        public static Graph<point> Generate(Graph<point> maingraph, int graphXMax, int graphYMax, int distance = 1)
         { 
             Vertex<point>[,] points = new Vertex<point>[graphXMax, graphYMax];
             for (int i = 0; i < graphXMax; i++)
@@ -23,7 +23,7 @@ namespace WeightedDirectGraphs
                 int prevY = 0;
                 for (int b = 0; b < graphYMax - 1; b++)
                 {
-                    maingraph.AddEdge(points[a, prevY], points[a, b + 1]);
+                    maingraph.AddEdge(points[a, prevY], points[a, b + 1], distance);
                     prevY = b + 1;
                 }
             }
@@ -32,7 +32,7 @@ namespace WeightedDirectGraphs
                 int prevX = 0;
                 for (int b = 0; b < graphXMax - 1; b++)
                 {
-                    maingraph.AddEdge(points[prevX, a], points[b + 1, a]);
+                    maingraph.AddEdge(points[prevX, a], points[b + 1, a], distance);
                     prevX = b + 1;
                 }
             }
@@ -44,7 +44,7 @@ namespace WeightedDirectGraphs
                 {
                     if (prevY != b - 1)
                     {
-                        maingraph.AddEdge(points[a - 1, prevY], points[a - 1, b - 1]);
+                        maingraph.AddEdge(points[a - 1, prevY], points[a - 1, b - 1], distance);
                         prevY = b - 1;
                     }
                 }
@@ -56,7 +56,7 @@ namespace WeightedDirectGraphs
                 {
                     if (prevX != b - 1)
                     {
-                        maingraph.AddEdge(points[prevX, a - 1], points[b - 1, a - 1]);
+                        maingraph.AddEdge(points[prevX, a - 1], points[b - 1, a - 1], distance);
                         prevX = b - 1;
                     }
                 }
@@ -67,6 +67,31 @@ namespace WeightedDirectGraphs
 
 
             return null;
+        }
+
+        public static double Manhattan(Vertex<point> node, Vertex<point> goal)
+        {
+            double dx = Math.Abs(node.Value.x - goal.Value.x);
+            double dy = Math.Abs(node.Value.y - goal.Value.y); ;
+            double dis = (dx + dy);
+            return dis;
+        }
+        public static double Diagonal(Vertex<point> node, Vertex<point> goal)
+        {
+
+            double dx = Math.Abs(node.Value.x - goal.Value.x);
+            double dy = Math.Abs(node.Value.y - goal.Value.y);
+            double dis = (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+            return dis;
+        }
+
+        public static double Euclidean(Vertex<point> node, Vertex<point> goal)
+        {
+
+            double dx = Math.Abs(node.Value.x - goal.Value.x);
+            double dy = Math.Abs(node.Value.y - goal.Value.y);
+            double dis = Math.Sqrt(dx * dx + dy * dy);
+            return dis;
         }
         static void Main(string[] args)
         {
@@ -168,32 +193,7 @@ namespace WeightedDirectGraphs
             //add edges
 
 
-            double Manhattan(Vertex<point> node, Vertex<point> goal)
-            {
-
-                double dx = Math.Abs(node.Value.x - node.Value.x);
-                double dy = Math.Abs(node.Value.y - node.Value.y);
-                double dis = (dx + dy);
-                return dis;
-            }
-
-            double Diagonal(Vertex<point> node, Vertex<point> goal)
-            {
-
-                double dx = Math.Abs(node.Value.x - node.Value.x);
-                double dy = Math.Abs(node.Value.y - node.Value.y);
-                double dis = (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
-                return dis;
-            }
-
-            double Euclidean(Vertex<point> node, Vertex<point> goal)
-            {
-
-                double dx = Math.Abs(node.Value.x - node.Value.x);
-                double dy = Math.Abs(node.Value.y - node.Value.y);
-                double dis = Math.Sqrt(dx * dx + dy * dy);
-                return dis;
-            }
+           
 
 
             //dijark = maingraph.DPathFind(points[0,0], points[2,2]);
@@ -212,5 +212,7 @@ namespace WeightedDirectGraphs
             //double depthPathDis = maingraph.depthPathFindCall(one, four, depthfirst);
 
         }
+
+      
     }
 }

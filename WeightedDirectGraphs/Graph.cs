@@ -35,7 +35,7 @@ namespace WeightedDirectGraphs
         public int EdgesCount => Edges.Count;
         public bool visited = false;
         public Vertex<T> founder = null;
-        public float disFromStart = float.PositiveInfinity;
+        public double disFromStart = double.PositiveInfinity;
         public double disFromEnd = double.PositiveInfinity;
         public bool blocked = false;
      
@@ -87,7 +87,7 @@ namespace WeightedDirectGraphs
             }
         }
 
-        public bool AddEdge(Vertex<T> verA, Vertex<T> verB, float distance = 0)
+        public bool AddEdge(Vertex<T> verA, Vertex<T> verB, float distance = 1)
         {
 
             Edge<T> newEdge = new Edge<T>(verA, verB, distance);
@@ -360,7 +360,7 @@ namespace WeightedDirectGraphs
                 current = priorityQ.pop();
                 for (int a = 0; a < current.Edges.Count; a++)
                 {
-                    float tentDis = current.disFromStart +
+                    double tentDis = current.disFromStart +
                         current.Edges[a].Distance;
 
                     if (tentDis < current.Edges[a].EndPoint.disFromStart)
@@ -434,10 +434,18 @@ namespace WeightedDirectGraphs
         {
             //tentative distances = current vertex's cumulative distance plus 
             //the weight to travel to that neighbor
+            for (int a = 0; a < VertexCount; a++)
+            {
+                Vertices[a].disFromEnd = double.PositiveInfinity;
+                Vertices[a].disFromStart = double.PositiveInfinity;
+                Vertices[a].founder = null;
+                Vertices[a].visited = false;
+            }
+           
 
             Vertex<T> current;
             Comparer<Vertex<T>> comp = Comparer<Vertex<T>>.Create((x, y) =>
-            x.disFromStart.CompareTo(y.disFromStart));
+            x.disFromEnd.CompareTo(y.disFromEnd));
             Priority<Vertex<T>> priorityQ = new Priority<Vertex<T>>(comp);
             start.disFromStart = 0;
 
@@ -449,22 +457,26 @@ namespace WeightedDirectGraphs
                 current = priorityQ.pop();
                 for (int a = 0; a < current.Edges.Count; a++)
                 {
-                    float tentDis = current.disFromStart + current.Edges[a].Distance;
-
-                    if (tentDis < current.Edges[a].EndPoint.disFromStart)
+                    if (!current.Edges[a].EndPoint.Equals(current))
                     {
-                        //do indexof here 
-                        current.Edges[a].EndPoint.disFromStart = tentDis;
-                        current.Edges[a].EndPoint.founder = current;
-                        current.Edges[a].EndPoint.disFromEnd = tentDis + Heuris(current.Edges[a].EndPoint, end);
+                        double tentDis = current.disFromStart + current.Edges[a].Distance;
+
+                        if (tentDis + Heuris(current.Edges[a].EndPoint, end) < current.Edges[a].EndPoint.disFromEnd)
+                        {
+                            //do indexof here 
+                            current.Edges[a].EndPoint.disFromStart = tentDis;
+                            current.Edges[a].EndPoint.founder = current;
+                            current.Edges[a].EndPoint.disFromEnd = tentDis + Heuris(current.Edges[a].EndPoint, end);
+
+                            //Add all un-visited & un-queued neighbors to the priority queue.
+                            if (current.Edges[a].EndPoint.visited == false && current.Edges[a].EndPoint.blocked != true)
+                            {
+                                priorityQ.insert(current.Edges[a].EndPoint);
+                            }
+                        }
                     }
 
-                    //Add all un-visited & un-queued neighbors to the priority queue.
-                    if (current.Edges[a].EndPoint.visited == false &&
-                        !priorityQ.contains(current.Edges[a].EndPoint) && current.Edges[a].EndPoint.blocked != true)
-                    {
-                        priorityQ.insert(current.Edges[a].EndPoint);
-                    }
+                    
 
                     //do indexOf instead of contains 
                 }

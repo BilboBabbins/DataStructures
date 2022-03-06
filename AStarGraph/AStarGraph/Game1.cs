@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using WeightedDirectGraphs;
 
 namespace GraphVisualiz
@@ -16,7 +17,8 @@ namespace GraphVisualiz
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         Graph<point> gridGraph;
-        const int graphSize = 3;
+        LinkedList<Vertex<point>> path = new LinkedList<Vertex<point>>();
+        const int graphSize = 20;
         const int screenSize = 1000;
         const int sqSize = screenSize / graphSize;
         Texture2D pixel;
@@ -29,6 +31,10 @@ namespace GraphVisualiz
         Button Diagonal;
         Button Euclidean;
         Button Start;
+        int type = 0;
+        point startPos;
+        point endPos;
+        //manhattan 1, diagonal 2, eulciicdan 3
         SpriteFont font;
 
         public Game1()
@@ -60,9 +66,10 @@ namespace GraphVisualiz
             }
             graph[0, 0].startTile = true;
             graph[0, 0].Tint = Color.Green;
+
             graph[graphSize - 1, graphSize - 1].endTile = true;
             graph[graphSize - 1, graphSize - 1].Tint = Color.Red;
-
+            endPos = new point(graphSize - 1, graphSize - 1);
 
 
             gridGraph = new Graph<point>();
@@ -142,8 +149,24 @@ namespace GraphVisualiz
             // TODO: Add your update logic here
            
             MouseState ms = Mouse.GetState();
-         
-          
+            Manhattan.Pressed(ms);
+            Diagonal.Pressed(ms);
+            Euclidean.Pressed(ms);
+            Start.Pressed(ms);
+
+            if (Manhattan.clicked == true)
+            {
+                type = 1;
+            }
+            if (Diagonal.clicked == true)
+            {
+                type = 2;
+            }
+            if (Euclidean.clicked == true)
+            {
+                type = 3;
+            }
+
 
             for (int a = 0; a < graphSize; a++)
             {
@@ -157,6 +180,7 @@ namespace GraphVisualiz
                         graph[a, b].endTile = true;
                         graph[a, b].Tint = Color.Red;
                         graph[a, b].wall = false;
+                        endPos = new point(a, b);
                         setEnd = false;
                     }
                     //setting start
@@ -165,6 +189,7 @@ namespace GraphVisualiz
                         graph[a, b].startTile = true;
                         graph[a, b].Tint = Color.Green;
                         graph[a, b].wall = false;
+                        startPos = new point(a, b);
                         setStart = false;
                     }
                     //setting wall
@@ -172,7 +197,7 @@ namespace GraphVisualiz
                         && graph[a, b].wall == false && graph[a, b].clicked == true && prev == ButtonState.Released)
                     {
                         graph[a, b].setWall();
-                        Vertex<point> blocked = gridGraph.Search(new point(5, 5));
+                        Vertex<point> blocked = gridGraph.Search(new point(a, b));
                         blocked.blocked = true;
                     }
                     //removing wall
@@ -180,6 +205,9 @@ namespace GraphVisualiz
                          && graph[a, b].wall == true && graph[a, b].clicked == true && prev == ButtonState.Released)
                     {
                         graph[a, b].removeWall();
+                        Vertex<point> blocked = gridGraph.Search(new point(a, b));
+                        blocked.blocked = false;
+                       
                     }
                     //removing start
                     else if (graph[a, b].startTile == true && graph[a, b].clicked == true && prev == ButtonState.Released)
@@ -198,7 +226,7 @@ namespace GraphVisualiz
               
                 }
             }
-            for (int a = 0; a < graphSize; a++)
+            /*for (int a = 0; a < graphSize; a++)
             {
                 for (int b = 0; b < graphSize; b++)
                 {
@@ -215,9 +243,68 @@ namespace GraphVisualiz
 
                     }
                 }
-            }
+            }*/
 
             //buttons updates
+            if (Start.clicked == true)
+            {
+                for (int a = 0; a < graphSize; a++)
+                {
+                    for (int b = 0; b < graphSize; b++)
+                    {
+                        if (graph[a, b].startTile != true && graph[a, b].endTile != true && graph[a, b].wall != true)
+                        {
+                            graph[a, b].Tint = Color.White;
+                        }
+
+                    }
+
+                }
+                //run astar and display
+                if (type == 1)
+                {
+                   
+                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Manhattan);
+                    var head = path.First.Next;
+                    while(head.Next != null)
+                    {
+                        //set graph path to a color
+                        
+                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
+                        head = head.Next;
+
+                    }
+                }
+                else if (type == 2)
+                {
+                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Diagonal);
+                    var head = path.First.Next;
+                    while (head.Next != null)
+                    {
+                        //set graph path to a color
+
+                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
+                        head = head.Next;
+
+                    }
+                }
+                else if (type == 3)
+                {
+                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Euclidean);
+                    var head = path.First.Next;
+                    while (head.Next != null)
+                    {
+                        //set graph path to a color
+
+                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
+                        head = head.Next;
+
+                    }
+                }
+
+            }
+            
+
 
             Window.Title = $"{ms.Position}";
             prev = ms.LeftButton;

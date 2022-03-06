@@ -12,18 +12,18 @@ namespace WeightedDirectGraphs
         {
             this.comparer = comp;
         }
-
+        //0,1,2,3,4,5
         void heapifyUp(int index)
         {
+            if(index <= 0) { return; }
             int parentInd = (index - 1) / 2;
 
-            while (comparer.Compare(values[index], values[parentInd]) == -1)
+            if (comparer.Compare(values[index], values[parentInd]) == -1)
             {
                 T bucket = values[index];
                 values[index] = values[parentInd];
                 values[parentInd] = bucket;
-                index = parentInd;
-                index = (index - 1) / 2;
+                heapifyUp(parentInd);
             }
 
         }
@@ -32,32 +32,39 @@ namespace WeightedDirectGraphs
         {
 
             //index  > children
-            int lChildInd = (index + 1) + index;
-            int rChildInd = (index + 2) + index;
+            //int lChildInd = (index + 1) + index;
+            //int rChildInd = (index + 2) + index;
+            int lChildInd = (index * 2) + 1;
+            int rChildInd = (index * 2) + 2;
+
+            if (lChildInd >= values.Length)
+            {
+                return;
+            }
 
             //values[index] > values[rchildind] && values[ind]
             // > values[lchild] && not leaf 
-            while ((rChildInd < values.Length || lChildInd < values.Length) &&
-                (comparer.Compare(values[index], values[rChildInd - 1]) == 1
-              || comparer.Compare(values[index], values[lChildInd - 1]) == 1))
-            {
-                if (comparer.Compare(values[lChildInd], values[rChildInd]) == -1)
+            //while ((rChildInd < values.Length || lChildInd < values.Length) &&
+            //    (comparer.Compare(values[index], values[rChildInd - 1]) == 1
+            //  || comparer.Compare(values[index], values[lChildInd - 1]) == 1))
+            //{
+                if (rChildInd >= values.Length || comparer.Compare(values[lChildInd], values[rChildInd]) == -1)
                 {
                     T bucket = values[index];
                     values[index] = values[lChildInd];
-                    values[(index + 1) + index] = bucket;
-                    index = (index + 1) + index;
+                    values[lChildInd] = bucket;
+                    heapifyDown(lChildInd);
                 }
 
 
-                if (comparer.Compare(values[rChildInd], values[lChildInd]) == -1)
+                else if (comparer.Compare(values[rChildInd], values[lChildInd]) <= 0)
                 {
                     T bucket = values[index];
                     values[index] = values[rChildInd];
-                    values[(index + 2) + index] = bucket;
-                    index = (index + 2) + index;
+                    values[rChildInd] = bucket;
+                    heapifyDown(rChildInd);
                 }
-            }
+            //}
         }
         public void insert(T value)
         {

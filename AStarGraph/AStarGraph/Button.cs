@@ -31,7 +31,7 @@ namespace GraphVisualiz
             TextColor = textColor;
         }
 
-        void Pressed(MouseState ms)
+        public void Pressed(MouseState ms)
         {
 
             if (ms.LeftButton == ButtonState.Pressed)
