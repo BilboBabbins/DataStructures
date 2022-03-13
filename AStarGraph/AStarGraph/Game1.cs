@@ -18,7 +18,9 @@ namespace GraphVisualiz
         private SpriteBatch spriteBatch;
         Graph<point> gridGraph;
         LinkedList<Vertex<point>> path = new LinkedList<Vertex<point>>();
-        const int graphSize = 20;
+        LinkedList<Vertex<point>> visited = new LinkedList<Vertex<point>>();
+        LinkedList<Vertex<point>> queued = new LinkedList<Vertex<point>>();
+        const int graphSize = 30;
         const int screenSize = 1000;
         const int sqSize = screenSize / graphSize;
         Texture2D pixel;
@@ -248,6 +250,9 @@ namespace GraphVisualiz
             //buttons updates
             if (Start.clicked == true)
             {
+
+               
+
                 for (int a = 0; a < graphSize; a++)
                 {
                     for (int b = 0; b < graphSize; b++)
@@ -260,44 +265,171 @@ namespace GraphVisualiz
                     }
 
                 }
+                //display visited and q in alg
+
+                 
                 //run astar and display
                 if (type == 1)
                 {
                    
-                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Manhattan);
-                    var head = path.First.Next;
-                    while(head.Next != null)
+                    var result = gridGraph.AStarPFVisualizer(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Manhattan);
+                    path = result.path;
+                    queued = result.queued;
+                    visited = result.visited;
+                   
+                    var headQue = queued.First;
+                    var headVisit = visited.First;
+
+                    while (headQue != null && headQue.Value != gridGraph.Search(endPos))
                     {
-                        //set graph path to a color
-                        
-                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
-                        head = head.Next;
+                        if (headQue.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headQue.Value.Value.x, (int)headQue.Value.Value.y].Tint = Color.LightGreen;
+                        }
+                        headQue = headQue.Next;
+                    }
+                    while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                    {
+                        if (headVisit.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.CornflowerBlue;
+                        }
+                         
+                        headVisit = headVisit.Next;
+                    }
+                    if (path == null)
+                    {
+                        headVisit = visited.First;
+                        while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                        {
+                            if (headVisit.Value != gridGraph.Search(startPos))
+                            {
+                                graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.Purple;
+                            }
+
+                            headVisit = headVisit.Next;
+                        }
 
                     }
+                    else
+                    {
+                        var headPath = path.First.Next;
+                        while (headPath.Value != gridGraph.Search(endPos))
+                        {
+                            //set graph path to a color
+                            graph[(int)headPath.Value.Value.x, (int)headPath.Value.Value.y].Tint = Color.Coral;
+                            headPath = headPath.Next;
+
+                        }
+
+                    }
+
                 }
                 else if (type == 2)
                 {
-                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Diagonal);
-                    var head = path.First.Next;
-                    while (head.Next != null)
-                    {
-                        //set graph path to a color
+                    var result = gridGraph.AStarPFVisualizer(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Diagonal);
+                    path = result.path;
+                    queued = result.queued;
+                    visited = result.visited;
 
-                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
-                        head = head.Next;
+                    var headQue = queued.First;
+                    var headVisit = visited.First;
+
+                    while (headQue != null && headQue.Value != gridGraph.Search(endPos))
+                    {
+                        if (headQue.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headQue.Value.Value.x, (int)headQue.Value.Value.y].Tint = Color.LightGreen;
+                        }
+                        headQue = headQue.Next;
+                    }
+                    while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                    {
+                        if (headVisit.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.CornflowerBlue;
+                        }
+
+                        headVisit = headVisit.Next;
+                    }
+                    if (path == null)
+                    {
+                        headVisit = visited.First;
+                        while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                        {
+                            if (headVisit.Value != gridGraph.Search(startPos))
+                            {
+                                graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.Purple;
+                            }
+
+                            headVisit = headVisit.Next;
+                        }
+
+                    }
+                    else
+                    {
+                        var headPath = path.First.Next;
+                        while (headPath.Value != gridGraph.Search(endPos))
+                        {
+                            //set graph path to a color
+                            graph[(int)headPath.Value.Value.x, (int)headPath.Value.Value.y].Tint = Color.Coral;
+                            headPath = headPath.Next;
+
+                        }
 
                     }
                 }
                 else if (type == 3)
                 {
-                    path = gridGraph.AStarPF(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Euclidean);
-                    var head = path.First.Next;
-                    while (head.Next != null)
-                    {
-                        //set graph path to a color
+                    var result = gridGraph.AStarPFVisualizer(gridGraph.Search(startPos), gridGraph.Search(endPos), WeightedDirectGraphs.Program.Euclidean);
+                    path = result.path;
+                    queued = result.queued;
+                    visited = result.visited;
+                 
+                    var headQue = queued.First;
+                    var headVisit = visited.First;
 
-                        graph[(int)head.Value.Value.x, (int)head.Value.Value.y].Tint = Color.Coral;
-                        head = head.Next;
+                    while (headQue != null && headQue.Value != gridGraph.Search(endPos))
+                    {
+                        if (headQue.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headQue.Value.Value.x, (int)headQue.Value.Value.y].Tint = Color.LightGreen;
+                        }
+                        headQue = headQue.Next;
+                    }
+                    while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                    {
+                        if (headVisit.Value != gridGraph.Search(startPos))
+                        {
+                            graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.CornflowerBlue;
+                        }
+
+                        headVisit = headVisit.Next;
+                    }
+                    if (path == null)
+                    {
+                        headVisit = visited.First;
+                        while (headVisit != null && headVisit.Value != gridGraph.Search(endPos))
+                        {
+                            if (headVisit.Value != gridGraph.Search(startPos))
+                            {
+                                graph[(int)headVisit.Value.Value.x, (int)headVisit.Value.Value.y].Tint = Color.Purple;
+                            }
+
+                            headVisit = headVisit.Next;
+                        }
+
+                    }
+                    else
+                    {
+                        var headPath = path.First.Next;
+                        while (headPath.Value != gridGraph.Search(endPos))
+                        {
+                            //set graph path to a color
+                            graph[(int)headPath.Value.Value.x, (int)headPath.Value.Value.y].Tint = Color.Coral;
+                            headPath = headPath.Next;
+
+                        }
 
                     }
                 }

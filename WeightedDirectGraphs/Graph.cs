@@ -46,7 +46,7 @@ namespace WeightedDirectGraphs
         }
     }
 
-    public class Graph<T> 
+    public class Graph<T>
     {
         public List<Vertex<T>> Vertices { get; private set; }
         public int VertexCount => Vertices.Count;
@@ -71,10 +71,10 @@ namespace WeightedDirectGraphs
                 // remove all edning point
                 //gotta loop through all those points
                 //damn what
-                for(int a = 0; a < Vertices.Count; a++)
+                for (int a = 0; a < Vertices.Count; a++)
                 {
-                   
-                        RemoveEdge(Vertices[a], ver);
+
+                    RemoveEdge(Vertices[a], ver);
 
                 }
 
@@ -103,7 +103,7 @@ namespace WeightedDirectGraphs
         }
         public bool RemoveEdge(Vertex<T> verA, Vertex<T> verB)
         {
-            
+
             if (verA == null || verB == null)
             {
                 return false;
@@ -123,7 +123,7 @@ namespace WeightedDirectGraphs
         public Vertex<T> Search(T value)
         {
             int index = -1;
-            for(int a = 0; a < Vertices.Count; a++)
+            for (int a = 0; a < Vertices.Count; a++)
             {
                 if (Vertices[a].Value.Equals(value))
                 {
@@ -143,7 +143,7 @@ namespace WeightedDirectGraphs
         }
         public Edge<T> getEdge(Vertex<T> verA, Vertex<T> verB)
         {
-            if (verA == null || verB == null || 
+            if (verA == null || verB == null ||
                 !verA.Edges.Any(edge => edge.EndPoint == verB))
             {
                 return null;
@@ -158,7 +158,7 @@ namespace WeightedDirectGraphs
             return null;
         }
 
-       
+
         //depth search
         //
         public float DepthTraversal(Vertex<T> start, List<Vertex<T>> values, HashSet<Vertex<T>> set, float dis)
@@ -167,10 +167,10 @@ namespace WeightedDirectGraphs
             // go through children
             // add
             // if none return
-            
+
             values.Add(start);
             set.Add(start);
-       
+
 
             if (start.Edges == null)
             {
@@ -183,9 +183,9 @@ namespace WeightedDirectGraphs
                     set.Add(start.Edges[a].EndPoint);
                     dis += start.Edges[a].Distance;
                     dis = DepthTraversal(start.Edges[a].EndPoint, values, set, dis);
-                   
+
                 }
-                
+
             }
             return dis;
         }
@@ -199,9 +199,9 @@ namespace WeightedDirectGraphs
         }
 
         //breadth first
-      
-       
-        float breadthSearch(Vertex<T> starting,List<Vertex<T>> stored)
+
+
+        float breadthSearch(Vertex<T> starting, List<Vertex<T>> stored)
         {
             // Dictionary<Vertex<T>, Vertex<T>> parents = new Dictionary<Vertex<T>, Vertex<T>>();
             Queue<Vertex<T>> queued = new Queue<Vertex<T>>();
@@ -288,7 +288,7 @@ namespace WeightedDirectGraphs
             }
             return totDistance;
         }
-        float depthPathFind(Vertex<T> start, Vertex<T> end , List<Vertex<T>> values, HashSet<Vertex<T>> set, float dis)
+        float depthPathFind(Vertex<T> start, Vertex<T> end, List<Vertex<T>> values, HashSet<Vertex<T>> set, float dis)
         {
             values.Add(start);
             set.Add(start);
@@ -319,8 +319,8 @@ namespace WeightedDirectGraphs
 
         public float breadthPathFindCall(Vertex<T> start, Vertex<T> end, List<Vertex<T>> breadthlist)
         {
-          
-            return breadthPathFind(start,end, breadthlist);
+
+            return breadthPathFind(start, end, breadthlist);
         }
         public float depthPathFindCall(Vertex<T> start, Vertex<T> end, List<Vertex<T>> depthlist)
         {
@@ -340,16 +340,16 @@ namespace WeightedDirectGraphs
 
         // tentative distances = current vertex's cumulative distance plus 
         //the weight to travel to that neighbor.
-       
+
 
         //LOOK ALL THE WAY DOWN FOR WHAT DID LAST CLASS
         public LinkedList<Vertex<T>> DPathFind(Vertex<T> start, Vertex<T> end)
         {
             //tentative distances = current vertex's cumulative distance plus 
             //the weight to travel to that neighbor
-            
+
             Vertex<T> current;
-            Comparer<Vertex<T>> comp = Comparer<Vertex<T>>.Create((x,y) =>
+            Comparer<Vertex<T>> comp = Comparer<Vertex<T>>.Create((x, y) =>
             x.disFromStart.CompareTo(y.disFromStart));
             Priority<Vertex<T>> priorityQ = new Priority<Vertex<T>>(comp);
             start.disFromStart = 0;
@@ -371,7 +371,7 @@ namespace WeightedDirectGraphs
                     }
 
                     //Add all un-visited & un-queued neighbors to the priority queue.
-                    if (current.Edges[a].EndPoint.visited == false && 
+                    if (current.Edges[a].EndPoint.visited == false &&
                         !priorityQ.contains(current.Edges[a].EndPoint))
                     {
                         priorityQ.insert(current.Edges[a].EndPoint);
@@ -406,7 +406,7 @@ namespace WeightedDirectGraphs
         //heurstics are like 'estimates' 
         //Dijk counts the steps then chooses the lesser one
         //only difference between a* and dijk is that A* includes an estimate. 
-        
+
 
         /* float Manhattan(Vertex<T> node, Vertex<T> goal)
          {
@@ -429,7 +429,7 @@ namespace WeightedDirectGraphs
         }*/
 
 
-        public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end, 
+        public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
             Func<Vertex<T>, Vertex<T>, double> Heuris)
         {
             //tentative distances = current vertex's cumulative distance plus 
@@ -441,7 +441,7 @@ namespace WeightedDirectGraphs
                 Vertices[a].founder = null;
                 Vertices[a].visited = false;
             }
-           
+
 
             Vertex<T> current;
             Comparer<Vertex<T>> comp = Comparer<Vertex<T>>.Create((x, y) =>
@@ -476,12 +476,12 @@ namespace WeightedDirectGraphs
                         }
                     }
 
-                    
+
 
                     //do indexOf instead of contains 
                 }
                 current.visited = true;
-                if (end.visited == true )
+                if (end.visited == true)
                 {
                     Vertex<T> temp = end;
                     LinkedList<Vertex<T>> path = new LinkedList<Vertex<T>>();
@@ -496,9 +496,86 @@ namespace WeightedDirectGraphs
             return null;
 
         }
+
+        
+        public (LinkedList<Vertex<T>> path, LinkedList<Vertex<T>> visited, LinkedList<Vertex<T>> queued) AStarPFVisualizer(Vertex<T> start, Vertex<T> end,
+             Func<Vertex<T>, Vertex<T>, double> Heuris)
+        {
+            //tentative distances = current vertex's cumulative distance plus 
+            //the weight to travel to that neighbor
+            LinkedList<Vertex<T>> visited = new LinkedList<Vertex<T>>();
+            LinkedList<Vertex<T>> queued = new LinkedList<Vertex<T>>();
+            for (int a = 0; a < VertexCount; a++)
+            {
+                Vertices[a].disFromEnd = double.PositiveInfinity;
+                Vertices[a].disFromStart = double.PositiveInfinity;
+                Vertices[a].founder = null;
+                Vertices[a].visited = false;
+            }
+
+            Vertex<T> current;
+            Comparer<(Vertex<T>,double)> comp = Comparer<(Vertex<T>,double)>.Create((x, y) =>
+            x.Item2.CompareTo(y.Item2));
+            
+            Priority<(Vertex<T>, double)> priorityQ = new Priority<(Vertex<T>,double)>(comp);
+            start.disFromStart = 0;
+
+            start.disFromEnd = Heuris(start, end);
+            priorityQ.insert((start, start.disFromEnd));
+
+            while (end.visited == false && priorityQ.values.Length != 0)
+            {
+                 current = priorityQ.pop().Item1;
+                if (current.visited != true)
+                {
+                    current.visited = true;
+                    visited.AddLast(current);
+                    for (int a = 0; a < current.Edges.Count; a++)
+                    {
+                        if (!current.Edges[a].EndPoint.Equals(current.founder))
+                        {
+                            double tentDis = current.disFromStart + current.Edges[a].Distance;
+
+                            if (tentDis + Heuris(current.Edges[a].EndPoint, end) < current.Edges[a].EndPoint.disFromEnd && tentDis < current.Edges[a].EndPoint.disFromStart)
+                            {
+                         
+                                current.Edges[a].EndPoint.disFromStart = tentDis;
+                                current.Edges[a].EndPoint.founder = current;
+                                current.Edges[a].EndPoint.disFromEnd = tentDis + Heuris(current.Edges[a].EndPoint, end);
+
+                                //Add all un-visited & un-queued neighbors to the priority queue.
+                                if (current.Edges[a].EndPoint.visited == false && current.Edges[a].EndPoint.blocked != true)
+                                {
+                                    priorityQ.insert((current.Edges[a].EndPoint, current.Edges[a].EndPoint.disFromEnd));
+                                    //queued.AddLast(current.Edges[a].EndPoint);
+                                }
+                            }
+                        }
+                        //do indexOf instead of contains 
+                    }
+                }
+                if (end.visited == true)
+                {
+                    for (int a = 0; a < priorityQ.values.Length; a++)
+                    {
+                        queued.AddLast(priorityQ.values[a].Item1);
+                    }
+
+                    Vertex<T> temp = end;
+                    LinkedList<Vertex<T>> path = new LinkedList<Vertex<T>>();
+                    while (current != null)
+                    {
+                        path.AddFirst(current);
+                        current = current.founder;
+                    }
+                    return (path, visited, queued);
+                }
+            }
+            return (null, visited, queued);
+
+        }
+
     }
-
-
 //priority que only takes in the float distance which means
 //the vertex is not attached to it 
 //find a way to 

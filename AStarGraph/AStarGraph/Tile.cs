@@ -14,6 +14,8 @@ namespace GraphVisualiz
         public bool endTile;
         public bool wall;
         public bool clicked;
+        public bool visited;
+        public bool inQueue;
         public int SqSize;
         public Rectangle hitbox;
         public bool path = false;
@@ -25,6 +27,8 @@ namespace GraphVisualiz
             startTile = false;
             endTile = false;
             wall = false;
+            visited = false;
+            inQueue = false;
         }
 
         public void drawSquare(SpriteBatch spriteBatch, int lineSize)
