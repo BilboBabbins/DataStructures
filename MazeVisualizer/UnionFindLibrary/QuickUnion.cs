@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace QuickFindUnion
+namespace UnionFindLibrary
 {
     class QuickUnion<T>
     {
@@ -29,10 +28,10 @@ namespace QuickFindUnion
         {
             int pInd = map[p];
             int parentOfInd = parents[map[p]];
-            while(parentOfInd != pInd)
+            while (parentOfInd != pInd)
             {
                 pInd = parentOfInd;
-                parentOfInd = parents[parentOfInd]; 
+                parentOfInd = parents[parentOfInd];
             }
             return parentOfInd;
         }
@@ -41,7 +40,7 @@ namespace QuickFindUnion
         {
             if (!AreConnected(p, q))
             {
-                parents[Find(p)] = Find(q); 
+                parents[Find(p)] = Find(q);
                 return true;
             }
             return false;
@@ -56,9 +55,5 @@ namespace QuickFindUnion
             }
             return false;
         }
-
-
-
     }
 }
-    

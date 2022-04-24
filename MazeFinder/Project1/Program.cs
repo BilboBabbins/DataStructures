@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+
+using System;
 using System.Collections.Generic;
 using WeightedDirectGraphs;
 
@@ -6,6 +8,8 @@ namespace WeightedDirectGraphs
 {
     public class Program
     {
+
+
         public static Graph<point> Generate(Graph<point> maingraph, int graphXMax, int graphYMax, int distance = 1)
         { 
             Vertex<point>[,] points = new Vertex<point>[graphXMax, graphYMax];
@@ -107,6 +111,8 @@ namespace WeightedDirectGraphs
 
             LinkedList<Vertex<point>> dijark = new LinkedList<Vertex<point>>();
             LinkedList<Vertex<point>> astar = new LinkedList<Vertex<point>>();
+
+
 
            
             /*double Diagonal(Vertex<double> node, Vertex<double> goal)

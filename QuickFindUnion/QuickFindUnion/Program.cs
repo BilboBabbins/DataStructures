@@ -17,7 +17,7 @@ namespace QuickFindUnion
             dogs.Union("ger shep", "golden ret");
             dogs.Union("golden ret", "shiba");
             bool connected = dogs.AreConnected("golden ret", "shiba");*/
-            QuickUnion<int> dogs = new QuickUnion<int>(dogList);
+            QuickFind<int> dogs = new QuickFind<int>(dogList);
             dogs.Union(7, 5);
             dogs.Union(4, 1);
             dogs.Union(7, 4);

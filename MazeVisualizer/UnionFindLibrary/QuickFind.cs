@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuickFindUnion
+namespace UnionFindLibrary
 {
-    class QuickUnion<T>
+    class QuickFind<T>
     {
-        private int[] parents;
+        private int[] sets;
         private Dictionary<T, int> map;
 
-        public QuickUnion(IEnumerable<T> items)//linq
+        public QuickFind(IEnumerable<T> items)//linq
         {
             map = new Dictionary<T, int>();
             int count = 0;
@@ -18,30 +18,28 @@ namespace QuickFindUnion
                 map.Add(item, count);
                 count++;
             }
-            parents = new int[count];
+            sets = new int[count];
             for (int a = 0; a < count; a++)
             {
-                parents[a] = a;
+                sets[a] = a;
             }
         }
 
-        public int Find(T p)
-        {
-            int pInd = map[p];
-            int parentOfInd = parents[map[p]];
-            while(parentOfInd != pInd)
-            {
-                pInd = parentOfInd;
-                parentOfInd = parents[parentOfInd]; 
-            }
-            return parentOfInd;
-        }
-
+        public int Find(T p) => sets[map[p]];
         public bool Union(T p, T q)
         {
             if (!AreConnected(p, q))
             {
-                parents[Find(p)] = Find(q); 
+                int pSet = Find(p);
+                int qSet = Find(q);
+
+                for (int a = 0; a < sets.Length; a++)
+                {
+                    if (sets[a] == pSet)
+                    {
+                        sets[a] = qSet;
+                    }
+                }
                 return true;
             }
             return false;
@@ -56,9 +54,6 @@ namespace QuickFindUnion
             }
             return false;
         }
-
-
-
     }
 }
-    
+
