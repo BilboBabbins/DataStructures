@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UnionFindLibrary
 {
-    class QuickFind<T>
+    public class QuickFind<T>
     {
         private int[] sets;
         private Dictionary<T, int> map;

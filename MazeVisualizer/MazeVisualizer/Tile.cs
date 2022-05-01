@@ -22,17 +22,17 @@ namespace MazeVisualizer
         {
             SqSize = sqSize;
         }
-        public void drawSquare(SpriteBatch spriteBatch)
+        public void drawSquare(SpriteBatch spriteBatch, int lineSize)
         {
             spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, SqSize), Tint);
             //top line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, SqSize), Color.Black);
+            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, lineSize), Color.Black);
             //right line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, SqSize), Color.Black);
+            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, lineSize, SqSize), Color.Black);
             //bottom line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y + SqSize, SqSize, SqSize), Color.Black);
+            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y + SqSize, SqSize, lineSize), Color.Black);
             //left line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X + SqSize, (int)Pos.Y, SqSize, SqSize), Color.Black);
+            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X + SqSize, (int)Pos.Y, lineSize, SqSize), Color.Black);
 
         }
     }

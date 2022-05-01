@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnionFindLibrary
 {
-    class QuickUnion<T>
+    public class QuickUnion<T>
     {
-        private int[] parents;
-        private Dictionary<T, int> map;
+        public int[] parents;
+        public Dictionary<T, int> map;
 
         public QuickUnion(IEnumerable<T> items)//linq
         {
@@ -55,5 +56,8 @@ namespace UnionFindLibrary
             }
             return false;
         }
+
+        public int UniqueSets()
+            => parents.Distinct().Count();
     }
 }

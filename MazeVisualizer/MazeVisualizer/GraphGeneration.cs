@@ -100,5 +100,21 @@ namespace MazeVisualizer
             double dis = Math.Sqrt(dx * dx + dy * dy);
             return dis;
         }
+
+     
+        public static (int y, int x) GeneratePos(int rows, int cols, Random rand)
+        {
+            return (rand.Next(0, rows), rand.Next(0, cols));
+        }
+
+        private static (int y, int x)[] directions = new [] { (-1, 0), (1, 0), (0, 1), (0, -1) };
+        public static (int y, int x) GenerateDirection(Random rand)
+        {
+            return directions[rand.Next(0, directions.Length)];
+        }
+        public static (int y, int x) AddDirection((int y, int x) ogPos, (int y, int x) direction)
+        {
+            return ((ogPos.y + direction.y), (ogPos.x + direction.x));
+        }
     }
 }
