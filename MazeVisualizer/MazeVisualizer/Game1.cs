@@ -17,7 +17,7 @@ namespace MazeVisualizer
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         Texture2D pixel;
-        const int graphSize = 30;
+        const int graphSize = 100;
         const int totalGridSize = 600;
         const int sqSize = totalGridSize / graphSize;
         const int extraScreen = 0;
@@ -74,7 +74,7 @@ namespace MazeVisualizer
             MazeUnion = new QuickUnion<(int y, int x)>(UnionValues);
 
             int unions = 0;
-            while (MazeUnion.UniqueSets() != 1)
+            while (unions != graphSize * graphSize - 1)
             {
 
                 (int y, int x) item1 = GraphGeneration.GeneratePos(graphSize, graphSize, rand);
@@ -112,7 +112,7 @@ namespace MazeVisualizer
                 }
             }
 
-
+            ;
             base.Initialize();
         }
 
@@ -136,7 +136,7 @@ namespace MazeVisualizer
                 Exit();
 
             // TODO: Add your update logic here
-            for (int i = 0; i < 3 && info.Count > 0; i++)
+            for (int i = 0; i < (int)(0.2 * graphSize) && info.Count > 0; i++)
             {
                 var pop = info.Pop();
                 ProcessData(pop);

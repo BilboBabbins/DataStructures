@@ -55,16 +55,5 @@ namespace UnionFindLibrary
             }
             return false;
         }
-
-        public int UniqueSets()
-        {
-            HashSet<int> set = new HashSet<int>();
-            foreach(var kvp in map)
-            {
-                set.Add(Find(kvp.Key));
-            }
-
-            return set.Count;
-        }
     }
 }
