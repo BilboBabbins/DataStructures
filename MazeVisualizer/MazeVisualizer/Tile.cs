@@ -21,18 +21,34 @@ namespace MazeVisualizer
             : base(texture, pos, color)
         {
             SqSize = sqSize;
+            rightWall = true;
+            leftWall = true;
+            topWall = true;
+            bottomWall = true;
         }
         public void drawSquare(SpriteBatch spriteBatch, int lineSize)
         {
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, SqSize), Tint);
-            //top line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, lineSize), Color.Black);
-            //right line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, lineSize, SqSize), Color.Black);
-            //bottom line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y + SqSize, SqSize, lineSize), Color.Black);
-            //left line
-            spriteBatch.Draw(Texture, new Rectangle((int)Pos.X + SqSize, (int)Pos.Y, lineSize, SqSize), Color.Black);
+            if (topWall)
+            {
+                spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, SqSize, lineSize), Color.Black);
+                //top line
+            }
+            if (rightWall)
+            {
+                spriteBatch.Draw(Texture, new Rectangle((int)Pos.X + SqSize, (int)Pos.Y, lineSize, SqSize), Color.Black);
+                //right line
+            }
+            if (bottomWall)
+            {
+                spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y + SqSize, SqSize, lineSize), Color.Black);
+                //bottom line
+            }
+            if (leftWall)
+            {
+                spriteBatch.Draw(Texture, new Rectangle((int)Pos.X, (int)Pos.Y, lineSize, SqSize), Color.Black);
+                //left line
+            }
+           
 
         }
     }

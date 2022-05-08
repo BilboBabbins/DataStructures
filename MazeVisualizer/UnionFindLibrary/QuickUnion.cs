@@ -12,16 +12,15 @@ namespace UnionFindLibrary
         public QuickUnion(IEnumerable<T> items)//linq
         {
             map = new Dictionary<T, int>();
+            
             int count = 0;
+            parents = new int[items.Count()];
+
             foreach (T item in items)
             {
                 map.Add(item, count);
+                parents[count] = count;
                 count++;
-            }
-            parents = new int[count];
-            for (int a = 0; a < count; a++)
-            {
-                parents[a] = a;
             }
         }
 
@@ -58,6 +57,14 @@ namespace UnionFindLibrary
         }
 
         public int UniqueSets()
-            => parents.Distinct().Count();
+        {
+            HashSet<int> set = new HashSet<int>();
+            foreach(var kvp in map)
+            {
+                set.Add(Find(kvp.Key));
+            }
+
+            return set.Count;
+        }
     }
 }

@@ -36,8 +36,7 @@ namespace MazeVisualizer
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Pos, Source, Tint, Rotation, Origin, Scale,
-                Effects, LayerDepth);
+            spriteBatch.Draw(Texture, Pos, Source, Tint, Rotation, Origin, Scale, Effects, LayerDepth);
         }
 
 
