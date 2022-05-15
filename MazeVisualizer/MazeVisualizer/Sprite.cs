@@ -20,7 +20,7 @@ namespace MazeVisualizer
         public SpriteEffects Effects { get; set; }
         public float LayerDepth { get; set; }
 
-        public Sprite(Texture2D texture, Vector2 pos, Color color,
+        public Sprite(Texture2D texture, Vector2 pos, Color color, Vector2 scale,
             Rectangle? source = null, float rotation = 0)
         {
             Texture = texture;
@@ -29,7 +29,7 @@ namespace MazeVisualizer
             Source = source;
             Rotation = rotation;
             Origin = new Vector2(0, 0);
-            Scale = new Vector2(1, 1);
+            Scale = scale;
             Effects = SpriteEffects.None;
             LayerDepth = 0;
         }

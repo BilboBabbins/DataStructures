@@ -17,14 +17,25 @@ namespace MazeVisualizer
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         Texture2D pixel;
-        const int graphSize = 100;
-        const int totalGridSize = 600;
-        const int sqSize = totalGridSize / graphSize;
-        const int extraScreen = 0;
+        int graphSize = 50;
+        const int totalGridSize = 800;
+        int sqSize;
+        const int extraScreen = 300;
         Tile[,] grid;
         Random rand = new Random();
         Stack<DrawingInfo> info = new Stack<DrawingInfo>();
+        bool startMaze = false;
 
+        SpriteFont font;
+        Button start;
+        Texture2D buttonTexture;
+        Texture2D arrowTexture;
+        Texture2D downArrowTexture;
+        ButtonState prev = ButtonState.Released;
+        Button mazeSizeText;
+        Button downArrow;
+        Button upArrow;
+       
         //set up grid thing with line squares 
         QuickUnion<(int y, int x)> MazeUnion;
 
@@ -39,38 +50,62 @@ namespace MazeVisualizer
         {
             // TODO: Add your initialization logic here
 
+            sqSize = totalGridSize / graphSize;
 
             pixel = new Texture2D(graphics.GraphicsDevice, 1, 1);
             pixel.SetData(new Color[] { Color.White });
             graphics.PreferredBackBufferWidth = totalGridSize + extraScreen;
             graphics.PreferredBackBufferHeight = totalGridSize;
             graphics.ApplyChanges();
+           InitGrid();
 
+
+            //Generate random x, y location, generate random direction x 
+            //Select either (x-1,y), (x+1,y),(x,y-1), (x, y+ 1)
+
+            //now make sure that pos is a valid index, if it's not then generate new direction  
+
+            base.Initialize();
+        }
+        void InitGrid()
+        {
             grid = new Tile[graphSize, graphSize];
-
-
             int posY = 0;
             int posX = 0;
-            (int y, int x)[] UnionValues = new (int y, int x)[graphSize * graphSize];
+           
 
             int count = 0;
             for (int y = 0; y < graphSize; y++)
             {
                 for (int x = 0; x < graphSize; x++)
                 {
-                    grid[y, x] = new Tile(pixel, new Vector2(posX, posY), Color.White, sqSize);
-                    UnionValues[count] = (y, x);
+                    grid[y, x] = new Tile(pixel, new Vector2(posX, posY), Color.White, sqSize, new Vector2(1, 1));
+                    //UnionValues[count] = (y, x);
                     count++;
                     posX += sqSize;
                 }
                 posY += sqSize;
                 posX = 0;
             }
+        }
+        void mazeGeneration()
+        {
+            (int y, int x)[] UnionValues = new (int y, int x)[graphSize * graphSize];
+            InitGrid();
+            info.Clear();
 
-            //Generate random x, y location, generate random direction x 
-            //Select either (x-1,y), (x+1,y),(x,y-1), (x, y+ 1)
+            //Loop through the rows and cols and set up the UnionValues array
+            int count = 0;
+            for (int y = 0; y < graphSize; y++)
+            {
+                for (int x = 0; x < graphSize; x++)
+                {       
+                   UnionValues[count] = (y, x);
+                    count++;
+                }
+                
+            }
 
-            //now make sure that pos is a valid index, if it's not then generate new direction  
             MazeUnion = new QuickUnion<(int y, int x)>(UnionValues);
 
             int unions = 0;
@@ -113,8 +148,8 @@ namespace MazeVisualizer
             }
 
             ;
-            base.Initialize();
         }
+
 
         //Generate random 2d position
 
@@ -125,7 +160,24 @@ namespace MazeVisualizer
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            font = Content.Load<SpriteFont>("Font");
+            buttonTexture = Content.Load<Texture2D>("Box");
+            arrowTexture = Content.Load<Texture2D>("arrow");
+            downArrowTexture = Content.Load<Texture2D>("downArrow");
+            start = new Button(buttonTexture, new Vector2(totalGridSize + 23, 650), Color.White, font, "Start", new Vector2(0.27f, 0.27f), Color.Black);
+            upArrow = new Button(arrowTexture, new Vector2(totalGridSize + 110, 50), Color.White, font, "", new Vector2(0.34f,0.34f), Color.Transparent );
+            downArrow = new Button(downArrowTexture, new Vector2(totalGridSize + 110, 325), Color.White, font, "", new Vector2(0.34f, 0.34f), Color.Transparent);
             watch.Start();
+            mazeSizeText = new Button(buttonTexture, new Vector2(totalGridSize + 23, 200), Color.White, font, $"{graphSize}", new Vector2(0.27f, 0.27f), Color.Black);
+
+            upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 175);
+
+            downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 175);
+
+            start.Tint = Color.FromNonPremultiplied(start.Tint.R, start.Tint.G, start.Tint.B, 175);
+            mazeSizeText.Tint = Color.FromNonPremultiplied(mazeSizeText.Tint.R, mazeSizeText.Tint.G, mazeSizeText.Tint.B, 175);
+
+        
         }
 
         Stopwatch watch = new Stopwatch();
@@ -136,13 +188,61 @@ namespace MazeVisualizer
                 Exit();
 
             // TODO: Add your update logic here
-            for (int i = 0; i < (int)(0.2 * graphSize) && info.Count > 0; i++)
+            if (startMaze)
             {
-                var pop = info.Pop();
-                ProcessData(pop);
+                for (int i = 0; i < (int)Math.Ceiling(0.2 * graphSize) && info.Count > 0; i++)
+                {
+                    var pop = info.Pop();
+                    ProcessData(pop);
+                }
+                if (info.Count == 0)
+                {
+                    startMaze = false;
 
+
+                    upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 175);
+
+                    downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 175);
+                }
             }
 
+            MouseState ms = Mouse.GetState();
+
+            if (start.IsClicked(ms))
+            {
+                startMaze = true;
+                mazeGeneration();
+
+                upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 65);
+
+                downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 65);
+            }
+            if (upArrow.IsClicked(ms))
+            {
+                if (!startMaze)
+                {
+                    if (graphSize < 100)
+                    {
+                        graphSize += 1;
+                    }
+                    mazeSizeText.Text = $"{graphSize}";
+                    sqSize = totalGridSize / graphSize;
+                    InitGrid();
+                }
+            }
+            if (downArrow.IsClicked(ms))
+            {
+                if (!startMaze)
+                {
+                    if (graphSize > 1)
+                    {
+                        graphSize -= 1;
+                    }
+                    mazeSizeText.Text = $"{graphSize}";
+                    sqSize = totalGridSize / graphSize;
+                    InitGrid();
+                }
+            }
             base.Update(gameTime);
         }
 
@@ -176,6 +276,7 @@ namespace MazeVisualizer
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
+           
             for (int a = 0; a < graphSize; a++)
             {
                 for (int b = 0; b < graphSize; b++)
@@ -183,6 +284,12 @@ namespace MazeVisualizer
                     grid[a, b].drawSquare(spriteBatch, 1);
                 }
             }
+            start.Draw(spriteBatch);
+
+            upArrow.Draw(spriteBatch);
+            downArrow.Draw(spriteBatch);
+
+            mazeSizeText.Draw(spriteBatch);
             base.Draw(gameTime);
             spriteBatch.End();
         }

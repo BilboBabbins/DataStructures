@@ -17,8 +17,8 @@ namespace MazeVisualizer
         public bool topWall;
         public bool bottomWall;
 
-        public Tile(Texture2D texture, Vector2 pos, Color color, int sqSize) 
-            : base(texture, pos, color)
+        public Tile(Texture2D texture, Vector2 pos, Color color, int sqSize, Vector2 scale) 
+            : base(texture, pos, color, scale)
         {
             SqSize = sqSize;
             rightWall = true;
@@ -49,7 +49,6 @@ namespace MazeVisualizer
                 //left line
             }
            
-
         }
     }
 }
