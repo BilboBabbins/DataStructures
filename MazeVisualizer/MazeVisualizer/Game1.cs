@@ -11,7 +11,14 @@ using UnionFindLibrary;
 
 namespace MazeVisualizer
 {
+    //WHEN U COME BAKC FROM KOREA DO THIS 
+    //when click one of the heuristics buttons 
+    // highlight the path taken, add delay so it loooks cool
+    //also fix the hesuristics buttons colors bc it doesn't match the other button colors
 
+
+    
+    
     public class Game1 : Game
     {
         private GraphicsDeviceManager graphics;
@@ -28,21 +35,30 @@ namespace MazeVisualizer
         bool startMaze = false;
         bool startPathfinding = false;
         //Graph<(int, int)> gridGraph;
-        bool setEnd = false;
-        bool setStart = false;
-        (int, int) startPos;
-        (int, int) endPos;
+        pathTiles startTile;
+        pathTiles endTile;
+        pathTiles[,] graphForPath;
 
         SpriteFont font;
         Button start;
         Texture2D buttonTexture;
         Texture2D arrowTexture;
         Texture2D downArrowTexture;
+        Texture2D redDotTexture;
+        Texture2D greenDotTexture;
         ButtonState prev = ButtonState.Released;
+
+        Button redDot;
+        Button greenDot;
+     
         Button mazeSizeText;
         Button downArrow;
         Button upArrow;
         Button startPathButton;
+
+        Button manhattan;
+        Button diagonal;
+        Button euclidean;
 
         //set up grid thing with line squares 
         QuickUnion<(int y, int x)> MazeUnion;
@@ -67,6 +83,7 @@ namespace MazeVisualizer
             graphics.ApplyChanges();
 
             InitGrid();
+
 
 
 
@@ -99,6 +116,31 @@ namespace MazeVisualizer
             }
         }
 
+        void InitGraphForPath()
+        {
+            graphForPath = new pathTiles[graphSize, graphSize];
+            int posX = 0;
+            int posY = 0;
+            for (int x = 0; x < graphSize; x++)
+            {
+                for (int y = 0; y < graphSize; y++)
+                {
+                    graphForPath[x, y] = new pathTiles(new Vector2(posX, posY), sqSize);
+                    posY += sqSize;
+                }
+                posX += sqSize;
+                posY = 0;
+            }
+            redDot.Pos = graphForPath[graphSize - 1, graphSize - 1].Pos;
+            greenDot.Pos = graphForPath[0, 0].Pos;
+            graphForPath[0, 0].startTile = true;
+            graphForPath[graphSize - 1, graphSize - 1].endTile = true;
+            endTile = graphForPath[graphSize - 1, graphSize - 1];
+            startTile = graphForPath[0, 0];
+
+            redDot.Scale = new Vector2((float)sqSize / redDotTexture.Width, (float)sqSize / redDotTexture.Width);
+            greenDot.Scale = new Vector2((float)sqSize / greenDotTexture.Width, (float)sqSize / greenDotTexture.Width);
+        }
         Graph<(int, int)> copyMaze(Tile[,] grid)
         {
             Graph<(int, int)> mazeGraph = new Graph<(int, int)>();
@@ -216,15 +258,27 @@ namespace MazeVisualizer
             buttonTexture = Content.Load<Texture2D>("Box");
             arrowTexture = Content.Load<Texture2D>("arrow");
             downArrowTexture = Content.Load<Texture2D>("downArrow");
+            redDotTexture = Content.Load<Texture2D>("reddot");
+            greenDotTexture = Content.Load<Texture2D>("greendot");
+            
             startPathButton = new Button(buttonTexture, new Vector2(totalGridSize + 23, 525), Color.White, font, "Path Start", new Vector2(0.27f, 0.27f), Color.Black);
-            start = new Button(buttonTexture, new Vector2(totalGridSize + 23, 650), Color.White, font, "Start", new Vector2(0.27f, 0.27f), Color.Black);
+            start = new Button(buttonTexture, new Vector2(totalGridSize + 23, 650), Color.White, font, "Maze Start", new Vector2(0.27f, 0.27f), Color.Black);
             upArrow = new Button(arrowTexture, new Vector2(totalGridSize + 110, 50), Color.White, font, "", new Vector2(0.34f, 0.34f), Color.Transparent);
             downArrow = new Button(downArrowTexture, new Vector2(totalGridSize + 110, 325), Color.White, font, "", new Vector2(0.34f, 0.34f), Color.Transparent);
             watch.Start();
             mazeSizeText = new Button(buttonTexture, new Vector2(totalGridSize + 23, 200), Color.White, font, $"{graphSize}", new Vector2(0.27f, 0.27f), Color.Black);
 
-            upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 175);
+            redDot = new Button(redDotTexture, new Vector2(0,0), Color.White, font, "", new Vector2((float) sqSize/redDotTexture.Width 
+                ,(float) sqSize/redDotTexture.Width ), Color.White);
+            greenDot = new Button(greenDotTexture, new Vector2(0,0), Color.White, font, "", new Vector2((float)sqSize/greenDotTexture.Width 
+                , (float)sqSize/greenDotTexture.Width  ), Color.White);
 
+
+            manhattan = new Button(buttonTexture, new Vector2(totalGridSize + 15, 100), Color.White, font, "Manhattan", new Vector2(0.27f, 0.27f), Color.Black);
+            diagonal = new Button(buttonTexture, new Vector2(totalGridSize + 15, 200), Color.White, font, "Diagonal", new Vector2(0.27f, 0.27f), Color.Black);
+            euclidean = new Button(buttonTexture, new Vector2(totalGridSize + 15, 300), Color.White, font, "Euclidean", new Vector2(0.27f, 0.27f), Color.Black);
+
+            upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 175);
             downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 175);
             startPathButton.Tint = Color.FromNonPremultiplied(start.Tint.R, start.Tint.G, start.Tint.B, 175);
             start.Tint = Color.FromNonPremultiplied(start.Tint.R, start.Tint.G, start.Tint.B, 175);
@@ -265,6 +319,11 @@ namespace MazeVisualizer
                 grid[0, 0].Tint = Color.Green;
                 startPathfinding = true;
                 copyMaze(grid);
+                InitGraphForPath();
+
+                //add a start and end points
+                //then when one of the buttons are clicked start
+
 
             }
             if (start.IsClicked(ms))
@@ -303,6 +362,42 @@ namespace MazeVisualizer
                 }
 
 
+            }
+
+            if (startPathfinding == true)
+            {
+               
+                for (int a = 0; a < graphSize; a++)
+                {
+                    for (int b = 0; b < graphSize; b++)
+                    { 
+                       if(graphForPath[a, b].LeftPressed(ms))
+                       {
+                            //set prev starttile false
+                            startTile.startTile = false;
+                            startTile = graphForPath[a, b];
+                            graphForPath[a, b].startTile = true;
+                            greenDot.Pos = graphForPath[a, b].Pos;
+                       }
+
+                       else if (graphForPath[a, b].RightPressed(ms))
+                       {
+                            //set prev endtile false
+                            endTile.endTile = false;
+                            endTile = graphForPath[a, b];
+                            graphForPath[a, b].endTile = true;
+                            redDot.Pos = graphForPath[a, b].Pos;
+                       }
+
+                    }
+                }
+                //get the start and end points
+                //generate path
+                //visualize path
+
+
+              
+            
             }
 
             base.Update(gameTime);
@@ -352,8 +447,17 @@ namespace MazeVisualizer
                 upArrow.Draw(spriteBatch);
                 downArrow.Draw(spriteBatch);
                 mazeSizeText.Draw(spriteBatch);
+                startPathButton.Draw(spriteBatch);
             }
-            startPathButton.Draw(spriteBatch);
+            else
+            {
+                redDot.Draw(spriteBatch);
+                greenDot.Draw(spriteBatch);
+                manhattan.Draw(spriteBatch);
+                euclidean.Draw(spriteBatch);
+                diagonal.Draw(spriteBatch);
+            }
+         
             base.Draw(gameTime);
             spriteBatch.End();
         }
