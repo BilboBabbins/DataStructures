@@ -38,6 +38,7 @@ namespace MazeVisualizer
         pathTiles startTile;
         pathTiles endTile;
         pathTiles[,] graphForPath;
+        LinkedList<Vertex<(int, int)>> path = new LinkedList<Vertex<(int,int)>>();
 
         SpriteFont font;
         Button start;
@@ -56,10 +57,15 @@ namespace MazeVisualizer
         Button upArrow;
         Button startPathButton;
 
-        Button manhattan;
-        Button diagonal;
-        Button euclidean;
+        Button manhattanButton;
+        Button diagonalButton;
+        Button euclideanButton;
+        Button loadPath;
 
+        bool manhattan;
+        bool diagonal;
+        bool euclidean;
+        
         //set up grid thing with line squares 
         QuickUnion<(int y, int x)> MazeUnion;
 
@@ -141,7 +147,7 @@ namespace MazeVisualizer
             redDot.Scale = new Vector2((float)sqSize / redDotTexture.Width, (float)sqSize / redDotTexture.Width);
             greenDot.Scale = new Vector2((float)sqSize / greenDotTexture.Width, (float)sqSize / greenDotTexture.Width);
         }
-        Graph<(int, int)> copyMaze(Tile[,] grid)
+        Graph<Vertex<(int, int)>> copyMaze(Tile[,] grid)
         {
             Graph<(int, int)> mazeGraph = new Graph<(int, int)>();
             Vertex<(int, int)>[,] points = new Vertex<(int, int)>[graphSize, graphSize];
@@ -152,8 +158,6 @@ namespace MazeVisualizer
                 {
                     points[a, b] = new Vertex<(int, int)>((a, b));
                     mazeGraph.AddVertex(points[a, b]);
-
-
                 }
             }
 
@@ -181,6 +185,30 @@ namespace MazeVisualizer
             }
 
             return mazeGraph;
+        }
+        public static double Manhattan(Vertex<(int,int)> node, Vertex<(int, int)> goal)
+        {
+            double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
+            double dy = Math.Abs(node.Value.Item2 - goal.Value.Item2); ;
+            double dis = (dx + dy);
+            return dis;
+        }
+        public static double Diagonal(Vertex<(int, int)> node, Vertex<(int, int)> goal)
+        {
+
+            double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
+            double dy = Math.Abs(node.Value.Item2 - goal.Value.Item2);
+            double dis = (dx + dy) + (Math.Sqrt(2) - 2 * 1) * Math.Min(dx, dy);
+            return dis;
+        }
+
+        public static double Euclidean(Vertex<(int, int)> node, Vertex<(int, int)> goal)
+        {
+
+            double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
+            double dy = Math.Abs(node.Value.Item2 - goal.Value.Item2);
+            double dis = Math.Sqrt(dx * dx + dy * dy);
+            return dis;
         }
         void mazeGeneration()
         {
@@ -261,8 +289,8 @@ namespace MazeVisualizer
             redDotTexture = Content.Load<Texture2D>("reddot");
             greenDotTexture = Content.Load<Texture2D>("greendot");
             
-            startPathButton = new Button(buttonTexture, new Vector2(totalGridSize + 23, 525), Color.White, font, "Path Start", new Vector2(0.27f, 0.27f), Color.Black);
-            start = new Button(buttonTexture, new Vector2(totalGridSize + 23, 650), Color.White, font, "Maze Start", new Vector2(0.27f, 0.27f), Color.Black);
+            startPathButton = new Button(buttonTexture, new Vector2(totalGridSize + 23, 650), Color.White, font, "Path Start", new Vector2(0.27f, 0.27f), Color.Black);
+            start = new Button(buttonTexture, new Vector2(totalGridSize + 23, 525), Color.White, font, "Maze Start", new Vector2(0.27f, 0.27f), Color.Black);
             upArrow = new Button(arrowTexture, new Vector2(totalGridSize + 110, 50), Color.White, font, "", new Vector2(0.34f, 0.34f), Color.Transparent);
             downArrow = new Button(downArrowTexture, new Vector2(totalGridSize + 110, 325), Color.White, font, "", new Vector2(0.34f, 0.34f), Color.Transparent);
             watch.Start();
@@ -274,9 +302,10 @@ namespace MazeVisualizer
                 , (float)sqSize/greenDotTexture.Width  ), Color.White);
 
 
-            manhattan = new Button(buttonTexture, new Vector2(totalGridSize + 15, 100), Color.White, font, "Manhattan", new Vector2(0.27f, 0.27f), Color.Black);
-            diagonal = new Button(buttonTexture, new Vector2(totalGridSize + 15, 200), Color.White, font, "Diagonal", new Vector2(0.27f, 0.27f), Color.Black);
-            euclidean = new Button(buttonTexture, new Vector2(totalGridSize + 15, 300), Color.White, font, "Euclidean", new Vector2(0.27f, 0.27f), Color.Black);
+            manhattanButton = new Button(buttonTexture, new Vector2(totalGridSize + 15, 100), Color.White, font, "Manhattan", new Vector2(0.27f, 0.27f), Color.Black);
+            diagonalButton = new Button(buttonTexture, new Vector2(totalGridSize + 15, 250), Color.White, font, "Diagonal", new Vector2(0.27f, 0.27f), Color.Black);
+            euclideanButton = new Button(buttonTexture, new Vector2(totalGridSize + 15, 400), Color.White, font, "Euclidean", new Vector2(0.27f, 0.27f), Color.Black);
+            loadPath = new Button(buttonTexture, new Vector2(totalGridSize + 15, 650), Color.White, font, "Load path", new Vector2(0.27f, 0.27f), Color.Black);
 
             upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 175);
             downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 175);
@@ -284,7 +313,7 @@ namespace MazeVisualizer
             start.Tint = Color.FromNonPremultiplied(start.Tint.R, start.Tint.G, start.Tint.B, 175);
             mazeSizeText.Tint = Color.FromNonPremultiplied(mazeSizeText.Tint.R, mazeSizeText.Tint.G, mazeSizeText.Tint.B, 175);
 
-
+             
         }
 
         Stopwatch watch = new Stopwatch();
@@ -330,7 +359,7 @@ namespace MazeVisualizer
             {
                 startMaze = true;
                 mazeGeneration();
-
+                
                 upArrow.Tint = Color.FromNonPremultiplied(upArrow.Tint.R, upArrow.Tint.G, upArrow.Tint.B, 65);
 
                 downArrow.Tint = Color.FromNonPremultiplied(downArrow.Tint.R, downArrow.Tint.G, downArrow.Tint.B, 65);
@@ -394,9 +423,43 @@ namespace MazeVisualizer
                 //get the start and end points
                 //generate path
                 //visualize path
+                if (manhattanButton.IsClicked(ms))
+                {
+                    manhattan = true;
+                    euclidean = false;
+                    diagonal = false;
+                }
+                if (diagonalButton.IsClicked(ms))
+                {
+                    manhattan = false;
+                    euclidean = false;
+                    diagonal = true;
+                }
+                if (euclideanButton.IsClicked(ms))
+                {
+                    manhattan = false;
+                    euclidean = true;
+                    diagonal = false;
+                }
 
-
-              
+                if (loadPath.IsClicked(ms))
+                {
+                    Graph<Vertex<(int, int)>> graph = copyMaze(grid);
+                    Vertex<(int, int)> start = new Vertex<(int, int)>(((int)startTile.Pos.X, (int)startTile.Pos.Y));
+                    Vertex<(int, int)> end = new Vertex<(int, int)>(((int)endTile.Pos.X, (int)endTile.Pos.Y));
+                    if (manhattan)
+                    {
+                        path = graph.AStarPF(graph.Search(start));
+                    }
+                    else if (diagonal)
+                    {
+                        path = graph.AStarPF();
+                    }
+                    else if (euclidean)
+                    {
+                        path = graph.AStarPF();
+                    }
+                }
             
             }
 
@@ -453,9 +516,10 @@ namespace MazeVisualizer
             {
                 redDot.Draw(spriteBatch);
                 greenDot.Draw(spriteBatch);
-                manhattan.Draw(spriteBatch);
-                euclidean.Draw(spriteBatch);
-                diagonal.Draw(spriteBatch);
+                manhattanButton.Draw(spriteBatch);
+                euclideanButton.Draw(spriteBatch);
+                diagonalButton.Draw(spriteBatch);
+                loadPath.Draw(spriteBatch);
             }
          
             base.Draw(gameTime);

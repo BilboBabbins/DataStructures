@@ -103,7 +103,7 @@ namespace WeightedDirectGraphs
             //copy + paste the work from there into here
             //once working
            
-
+            //dijkstras
 
             LinkedList<Vertex<point>> dijark = new LinkedList<Vertex<point>>();
             LinkedList<Vertex<point>> astar = new LinkedList<Vertex<point>>();

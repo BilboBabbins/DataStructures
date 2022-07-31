@@ -388,7 +388,7 @@ namespace UnionFindLibrary
         }*/
 
 
-        public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
+        /*public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
             Func<Vertex<T>, Vertex<T>, double> Heuris)
         {
             //tentative distances = current vertex's cumulative distance plus 
@@ -405,7 +405,7 @@ namespace UnionFindLibrary
             Vertex<T> current;
             Comparer<Vertex<T>> comp = Comparer<Vertex<T>>.Create((x, y) =>
             x.disFromEnd.CompareTo(y.disFromEnd));
-            Heap<Vertex<T>> priorityQ = new Heap<Vertex<T>>(comp);
+            Priority<Vertex<T>> priorityQ = new Priority<Vertex<T>>(comp);
             start.disFromStart = 0;
 
             start.disFromEnd = Heuris(start, end);
@@ -455,9 +455,9 @@ namespace UnionFindLibrary
             return null;
 
         }
+        */
 
-
-        public (LinkedList<Vertex<T>> path, LinkedList<Vertex<T>> visited, LinkedList<Vertex<T>> queued) AStarPFVisualizer(Vertex<T> start, Vertex<T> end,
+        public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
              Func<Vertex<T>, Vertex<T>, double> Heuris)
         {
             //tentative distances = current vertex's cumulative distance plus 
@@ -527,10 +527,10 @@ namespace UnionFindLibrary
                         path.AddFirst(current);
                         current = current.founder;
                     }
-                    return (path, visited, queued);
+                    return path;
                 }
             }
-            return (null, visited, queued);
+            return null;
 
         }
 
