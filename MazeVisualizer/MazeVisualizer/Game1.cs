@@ -7,14 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using MonoGame.Extended;
+
 using UnionFindLibrary;
 
 namespace MazeVisualizer
 {
-    //WHEN U COME BAKC FROM KOREA DO THIS 
-    //when click one of the heuristics buttons 
-    // highlight the path taken, add delay so it loooks cool
-    //also fix the hesuristics buttons colors bc it doesn't match the other button colors
+    
 
 
     
@@ -38,7 +37,12 @@ namespace MazeVisualizer
         pathTiles startTile;
         pathTiles endTile;
         pathTiles[,] graphForPath;
-        LinkedList<Vertex<(int, int)>> path = new LinkedList<Vertex<(int,int)>>();
+        List<Vertex<(int, int)>> path = new List<Vertex<(int,int)>>();
+         Queue<(Vertex<(int, int)>, Vertex<(int, int)>)> pathQueue = new Queue<(Vertex<(int, int)>, Vertex<(int, int)>)>();
+         //add 2 from path into queue so its like a full line, pop line, delay, animatoin
+        // TODO: get rid of hacky name
+        TimeSpan timeSpan = TimeSpan.Zero;
+
 
         SpriteFont font;
         Button start;
@@ -61,11 +65,16 @@ namespace MazeVisualizer
         Button diagonalButton;
         Button euclideanButton;
         Button loadPath;
+       
 
         bool manhattan;
         bool diagonal;
         bool euclidean;
-        
+
+        bool endTilePressed = false;
+        bool startTilePressed = false;
+        bool drawPath;
+
         //set up grid thing with line squares 
         QuickUnion<(int y, int x)> MazeUnion;
 
@@ -93,10 +102,6 @@ namespace MazeVisualizer
 
 
 
-            //Generate random x, y location, generate random direction x 
-            //Select either (x-1,y), (x+1,y),(x,y-1), (x, y+ 1)
-
-            //now make sure that pos is a valid index, if it's not then generate new direction  
 
             base.Initialize();
         }
@@ -137,17 +142,12 @@ namespace MazeVisualizer
                 posX += sqSize;
                 posY = 0;
             }
-            redDot.Pos = graphForPath[graphSize - 1, graphSize - 1].Pos;
-            greenDot.Pos = graphForPath[0, 0].Pos;
-            graphForPath[0, 0].startTile = true;
-            graphForPath[graphSize - 1, graphSize - 1].endTile = true;
-            endTile = graphForPath[graphSize - 1, graphSize - 1];
-            startTile = graphForPath[0, 0];
+            
 
-            redDot.Scale = new Vector2((float)sqSize / redDotTexture.Width, (float)sqSize / redDotTexture.Width);
-            greenDot.Scale = new Vector2((float)sqSize / greenDotTexture.Width, (float)sqSize / greenDotTexture.Width);
+            redDot.Scale = new Vector2((float)sqSize / (redDotTexture.Width ), (float)sqSize / (redDotTexture.Width));
+            greenDot.Scale = new Vector2((float)sqSize / (greenDotTexture.Width ), (float)sqSize / (greenDotTexture.Width));
         }
-        Graph<Vertex<(int, int)>> copyMaze(Tile[,] grid)
+        Graph<(int, int)> copyMaze(Tile[,] grid)
         {
             Graph<(int, int)> mazeGraph = new Graph<(int, int)>();
             Vertex<(int, int)>[,] points = new Vertex<(int, int)>[graphSize, graphSize];
@@ -161,39 +161,39 @@ namespace MazeVisualizer
                 }
             }
 
-            for (int y = 0; y < graphSize; y++)
+            for (int x = 0; x < graphSize; x++)
             {
-                for (int x = 0; x < graphSize; x++)
+                for (int y = 0; y < graphSize; y++)
                 {
-                    if (x + 1 < graphSize && !grid[y, x].rightWall)
+                    if (y + 1 < graphSize && !grid[x, y].rightWall)
                     {
-                        mazeGraph.AddEdge(points[y, x], points[y, x + 1], 1); //Right edge
+                        mazeGraph.AddEdge(points[x, y], points[x, y + 1], 1); //Right edge
                     }
-                    if (x - 1 >= 0 && !grid[y, x].leftWall)
+                    if (y - 1 >= 0 && !grid[x, y].leftWall)
                     {
-                        mazeGraph.AddEdge(points[y, x], points[y, x - 1], 1); //Left edge
+                        mazeGraph.AddEdge(points[x, y], points[x, y - 1], 1); //Left edge
                     }
-                    if (y + 1 < graphSize && !grid[y,x].bottomWall)
+                    if (x + 1 < graphSize && !grid[x,y].bottomWall)
                     {
-                        mazeGraph.AddEdge(points[y, x], points[y + 1, x], 1); //Down edge
+                        mazeGraph.AddEdge(points[x, y], points[x + 1, y], 1); //Down edge
                     }
-                    if (y - 1 >= 0 && !grid[y,x].topWall)
+                    if (x - 1 >= 0 && !grid[x,y].topWall)
                     {
-                        mazeGraph.AddEdge(points[y, x], points[y - 1, x], 1); //Up edge
+                        mazeGraph.AddEdge(points[x, y], points[x - 1, y], 1); //Up edge
                     }
                 }
             }
 
             return mazeGraph;
         }
-        public static double Manhattan(Vertex<(int,int)> node, Vertex<(int, int)> goal)
+        public double Manhattan(Vertex<(int,int)> node, Vertex<(int, int)> goal)
         {
             double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
             double dy = Math.Abs(node.Value.Item2 - goal.Value.Item2); ;
             double dis = (dx + dy);
             return dis;
         }
-        public static double Diagonal(Vertex<(int, int)> node, Vertex<(int, int)> goal)
+        public double Diagonal(Vertex<(int, int)> node, Vertex<(int, int)> goal)
         {
 
             double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
@@ -202,7 +202,7 @@ namespace MazeVisualizer
             return dis;
         }
 
-        public static double Euclidean(Vertex<(int, int)> node, Vertex<(int, int)> goal)
+        public double Euclidean(Vertex<(int, int)> node, Vertex<(int, int)> goal)
         {
 
             double dx = Math.Abs(node.Value.Item1 - goal.Value.Item1);
@@ -395,7 +395,7 @@ namespace MazeVisualizer
 
             if (startPathfinding == true)
             {
-               
+                
                 for (int a = 0; a < graphSize; a++)
                 {
                     for (int b = 0; b < graphSize; b++)
@@ -403,22 +403,26 @@ namespace MazeVisualizer
                        if(graphForPath[a, b].LeftPressed(ms))
                        {
                             //set prev starttile false
-                            startTile.startTile = false;
+                           
                             startTile = graphForPath[a, b];
-                            graphForPath[a, b].startTile = true;
                             greenDot.Pos = graphForPath[a, b].Pos;
+                            startTile.graphPos = (a, b);
+                            startTilePressed = true;
                        }
 
                        else if (graphForPath[a, b].RightPressed(ms))
                        {
                             //set prev endtile false
-                            endTile.endTile = false;
+
+                           
+                            endTilePressed = true;
                             endTile = graphForPath[a, b];
-                            graphForPath[a, b].endTile = true;
                             redDot.Pos = graphForPath[a, b].Pos;
+                            endTile.graphPos = (a, b);
                        }
 
                     }
+                   
                 }
                 //get the start and end points
                 //generate path
@@ -444,23 +448,45 @@ namespace MazeVisualizer
 
                 if (loadPath.IsClicked(ms))
                 {
-                    Graph<Vertex<(int, int)>> graph = copyMaze(grid);
-                    Vertex<(int, int)> start = new Vertex<(int, int)>(((int)startTile.Pos.X, (int)startTile.Pos.Y));
-                    Vertex<(int, int)> end = new Vertex<(int, int)>(((int)endTile.Pos.X, (int)endTile.Pos.Y));
+                    if (endTilePressed == false)
+                    {            
+                        endTile = graphForPath[graphSize - 1, graphSize - 1];
+                        endTile.graphPos = (graphSize - 1, graphSize - 1);
+                        redDot.Pos = graphForPath[graphSize - 1, graphSize - 1].Pos;
+                    }
+                    if (startTilePressed == false)
+                    {
+                        startTile = graphForPath[0, 0];
+                        startTile.graphPos = (0, 0);
+                        greenDot.Pos = graphForPath[0, 0].Pos;
+                    }
+                    Graph<(int, int)> graph = copyMaze(grid);
+                    (int, int) start = startTile.graphPos;
+                    (int, int) end = endTile.graphPos;
                     if (manhattan)
                     {
-                        path = graph.AStarPF(graph.Search(start));
+                        path = graph.AStarPF(graph.Search(start), graph.Search(end), Manhattan);
                     }
                     else if (diagonal)
                     {
-                        path = graph.AStarPF();
+                        path = graph.AStarPF(graph.Search(start), graph.Search(end), Diagonal);
                     }
                     else if (euclidean)
                     {
-                        path = graph.AStarPF();
+                        path = graph.AStarPF(graph.Search(start), graph.Search(end), Euclidean);
                     }
+                    drawPath = true;
+
                 }
             
+            }
+
+            timeSpan += gameTime.ElapsedGameTime;
+
+            if (timeSpan.TotalMilliseconds > 300)
+            {
+                
+                timeSpan -= TimeSpan.FromMilliseconds(300);
             }
 
             base.Update(gameTime);
@@ -521,7 +547,18 @@ namespace MazeVisualizer
                 diagonalButton.Draw(spriteBatch);
                 loadPath.Draw(spriteBatch);
             }
-         
+
+            if (drawPath)
+            {
+                for (int x = 0; x < path.Count -1; x++)
+                {
+                    //graphForPath[].Po
+                    (int xx1, int yy1) = path[x].Value;
+                    (int xx2, int yy2) = path[x + 1].Value;
+
+                    spriteBatch.DrawLine(graphForPath[yy1, xx1].Pos + new Vector2(sqSize / 2.0f, sqSize/2.0f), graphForPath[yy2, xx2].Pos + new Vector2(sqSize / 2.0f, sqSize / 2.0f), Color.White, 2);
+                }
+            }
             base.Draw(gameTime);
             spriteBatch.End();
         }

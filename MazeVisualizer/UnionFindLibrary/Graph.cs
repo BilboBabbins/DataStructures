@@ -457,7 +457,7 @@ namespace UnionFindLibrary
         }
         */
 
-        public LinkedList<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
+        public List<Vertex<T>> AStarPF(Vertex<T> start, Vertex<T> end,
              Func<Vertex<T>, Vertex<T>, double> Heuris)
         {
             //tentative distances = current vertex's cumulative distance plus 
@@ -527,7 +527,7 @@ namespace UnionFindLibrary
                         path.AddFirst(current);
                         current = current.founder;
                     }
-                    return path;
+                    return path.ToList();
                 }
             }
             return null;

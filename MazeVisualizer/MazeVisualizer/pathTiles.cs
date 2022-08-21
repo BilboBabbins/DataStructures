@@ -12,49 +12,49 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MazeVisualizer
 {
-    class pathTiles 
+    class pathTiles
     {
-    
-            public bool startTile;
-            public bool endTile;
-            public bool wall;
-            public bool clicked;
-            public bool visited;
-            public int SqSize;
-            public Rectangle hitbox;
-            public bool path = false;
-            public Vector2 Pos;
-            public pathTiles(Vector2 pos,int sqSize)
-                
-            {
-                Pos = pos;
-                SqSize = sqSize;
-                hitbox = new Rectangle((int)pos.X, (int)pos.Y, sqSize, sqSize);
-                startTile = false;
-                endTile = false;
-                wall = false;
-                visited = false;
-            }
 
-           
-            public bool RightPressed(MouseState ms)
+
+
+        public bool wall;
+        public bool clicked;
+        public bool visited;
+        public int SqSize;
+        public Rectangle hitbox;
+        public bool path = false;
+        public Vector2 Pos;
+        public (int, int) graphPos;
+        public pathTiles(Vector2 pos, int sqSize)
+
+        {
+            Pos = pos;
+            SqSize = sqSize;
+            hitbox = new Rectangle((int)pos.X, (int)pos.Y, sqSize, sqSize);
+
+            wall = false;
+            visited = false;
+        }
+
+
+        public bool RightPressed(MouseState ms)
+        {
+            if (ms.RightButton == ButtonState.Pressed)
             {
-                if (ms.RightButton == ButtonState.Pressed)
+                if (hitbox.Contains(ms.Position))
                 {
-                    if (hitbox.Contains(ms.Position))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                     return false;
-                    }
+                    return true;
                 }
                 else
                 {
                     return false;
                 }
             }
+            else
+            {
+                return false;
+            }
+        }
 
         public bool LeftPressed(MouseState ms)
         {
@@ -76,32 +76,7 @@ namespace MazeVisualizer
         }
 
 
-        public void setStart(MouseState ms, ButtonState prev)
-            {
-                if (ms.LeftButton == ButtonState.Pressed)
-                {
-                    startTile = true; 
-                }
-                if (ms.LeftButton == ButtonState.Pressed && prev == ButtonState.Released)
-                {
 
-
-                }
-            }
-
-            public void setEnd(MouseState ms, ButtonState prev)
-            {
-                if (ms.RightButton == ButtonState.Pressed)
-                {
-                    endTile = true;
-
-                }
-                if (ms.RightButton == ButtonState.Pressed && prev == ButtonState.Released)
-                {
-
-
-                }
-        }
-        }
+          }
     }
 
