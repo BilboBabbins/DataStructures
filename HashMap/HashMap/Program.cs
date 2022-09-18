@@ -10,17 +10,22 @@ namespace HashMap
             hashMap<int, string> dogs = new hashMap<int, string>();
             dogs.Add(12, "poodle");
             dogs.Add(2, "german shep");
-            dogs.Add(112, "german shep");
-            dogs.Add(42, "german shep");
-            dogs.Add(62, "german shep");
-            dogs.Add(423, "german shep");
-            dogs.Add(7654, "german shep");
-            dogs.Add(13212, "german shep");
-            dogs.Add(23, "german shep");
-            dogs.Add(223, "german shep");
-            dogs.Add(21, "german shep");
-            dogs[2] = "golden retriever";
+           
+            
+            
             //dogs.ReHash();
+
+            BloomFlter<string> test = new BloomFlter<string>(dogs.Count);
+            int HashFunc1(string item)
+            {
+                return item.GetHashCode() % dogs.Count;
+            }
+            test.LoadHashFunc(HashFunc1);
+
+
+            test.Insert(dogs[4]);
+
+            bool contains = test.ProbContains(dogs[4]);
 
             Console.WriteLine("Hello World!");
         }
